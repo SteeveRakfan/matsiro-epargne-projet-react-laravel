@@ -1,0 +1,5 @@
+1. { Ne jamais omettre le h-('peu importe') si son contenu a h-full
+ex: <div className="h-full"><img className="h-full" /></div>
+    non: <div><img className="h-full" /></div>
+sinon ça bug!!! }
+

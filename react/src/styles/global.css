@@ -1,0 +1,60 @@
+@import "tailwindcss";
+@import "hamburger-toggler.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+* {
+  min-width: 0;
+}
+li {
+  list-style-type: none;
+}
+button:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+@font-face {
+  font-family: "Inter";
+  src:
+    url("../../public/fonts/Inter-VariableFont_opsz,wght.ttf")
+      format("truetype-variations"),
+    url("../../public/fonts/Inter-VariableFont_opsz,wght.ttf")
+      format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto";
+  src:
+    url("../../public/fonts/Roboto-VariableFont_wdth,wght.ttf")
+      format("truetype-variations"),
+    url("../../public/fonts/Roboto-VariableFont_wdth,wght.ttf")
+      format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Dancing";
+  src:
+    url("../../public/fonts/DancingScript-VariableFont_wght.ttf")
+      format("truetype-variations"),
+    url("../../public/fonts/DancingScript-VariableFont_wght.ttf")
+      format("truetype");
+  /* Ajusté ici pour correspondre à la vraie plage de Dancing Script */
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-inter: "Inter", sans-serif;
+  --font-roboto: "Roboto", sans-serif;
+  --font-dancing: "Dancing", sans-serif;
+}

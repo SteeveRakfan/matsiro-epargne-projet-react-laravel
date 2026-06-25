@@ -1,0 +1,38 @@
+.hamburger-toggler {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 35px;
+  aspect-ratio: 1/1;
+  position: relative;
+  cursor: pointer;
+}
+.hamburger-toggler::before {
+  content: "";
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  background: #000;
+  border-radius: 100px;
+  box-shadow: 0 10px 0 0 #000;
+  transition: 0.2s;
+  transform: translateY(-10px);
+}
+.hamburger-toggler::after {
+  content: "";
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  background: #000;
+  border-radius: 100px;
+  transition: 0.5s;
+  transform: translateY(10px);
+}
+.hamburger-toggler.active::before {
+  transform: rotate(-45deg);
+  box-shadow: none;
+}
+.hamburger-toggler.active::after {
+  transform: rotate(45deg);
+  box-shadow: none;
+}

@@ -1,0 +1,186 @@
+import React, { useContext, useEffect, useState } from "react";
+import AuthNav from "../../../components/common/AuthNav";
+import ApiService from "../../../services/apiService";
+import AuthTitle1 from "../../../components/common/AuthTitle1";
+import AuthContainer from "../../../components/common/AuthContainer";
+import Logo from "../../../components/common/Logo";
+import Button1 from "../../../components/common/Button1";
+import Modal from "../../../components/common/Modal";
+import UserContext from "../../../contexts/UserContext";
+import Input2 from "../../../components/common/Input2";
+
+export default function Expenses() {
+  const { user } = useContext(UserContext);
+  const [expenses, setExpenses] = useState([]);
+  const [modalShown, setModalShown] = useState(false);
+  const [form, setForm] = useState({
+    user_id: user?.id,
+    category_id: null,
+    title: null,
+    description: null,
+    amount: null,
+    date: null,
+    payment_method: null,
+    reference_number: null,
+    status: null,
+    is_recurring: false,
+    recurring_frequency: null,
+    recurring_end_date: null,
+  });
+  const [fields, setFields] = useState([
+    { name: "title", label: "Title" },
+    { name: "description", label: "Description", textarea: true },
+    { name: "amount", label: "Amount", number: true },
+    { name: "date", label: "Date", date: true },
+    { name: "category_id", label: "Category", select: true, options: [] },
+    {
+      name: "payment_method",
+      label: "Payment method",
+      select: true,
+      options: [
+        { name: "Cash", value: "cash" },
+        { name: "Bank transfer", value: "bank_transfer" },
+        { name: "credit card", value: "credit_card" },
+        { name: "Mobile money", value: "mobile_money" },
+        { name: "Check", value: "check" },
+        { name: "Other", value: "other" },
+      ],
+    },
+    { name: "reference_number", label: "Reference number", notRequired: true },
+    {
+      name: "status",
+      label: "Status",
+      select: true,
+      options: [
+        { name: "Paid", value: "paid" },
+        { name: "Pending", value: "pending" },
+        { name: "Cancelled", value: "cancelled" },
+        { name: "Refunded", value: "refunded" },
+      ],
+    },
+    {
+      name: "is_recurring",
+      label: "Is it a regular expense? (daily, weekly, monthly, yearly)",
+      checkbox: true,
+      groupLeader: true,
+      group: "recurrence",
+      notRequired: true,
+    },
+    {
+      name: "recurring_frequency",
+      label: "Recurring frequency",
+      group: "recurrence",
+    },
+    {
+      name: "recurring_end_date",
+      label: "Recurring end date",
+      group: "recurrence",
+      date: true,
+      notRequired: true,
+    },
+  ]);
+  const fetchExpenses = async () => {
+    const data = await ApiService.getExpenses();
+    setExpenses(data?.expenses?.data || []);
+  };
+  const fetchCategories = async () => {
+    const data = await ApiService.getExpenseCategories();
+    const categories = data.expense_categories;
+    setFields((prev) =>
+      prev.map((field) =>
+        field.name !== "category_id"
+          ? field
+          : { ...field, options: categories },
+      ),
+    );
+  };
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+  return (
+    <div>
+      <AuthNav />
+      <AuthContainer>
+        <div className="flex justify-between items-center mb-10">
+          <AuthTitle1 title="Expenses" />
+          <Button1 className="shrink-0" onClick={() => setModalShown(true)}>
+            New expense +
+          </Button1>
+        </div>
+        <div className="flex flex-col items-center gap-5">
+          {expenses?.length ? (
+            expenses.map((expense, index) => (
+              <div key={index}>{expense.title}</div> // Correction ici : ajout des accolades {}
+            ))
+          ) : (
+            <div className="flex flex-col items-center border border-dashed rounded-lg border-gray-600 w-full pt-20 pb-20">
+              <Logo pale className="scale-[300%]" />
+              <div className="bg-slate-50 dark:bg-slate-800 w-full rounded-lg text-center text-slate-800 dark:text-slate-200 text-sm p-3 mt-20">
+                <p>No expenses yet</p>
+                <p>
+                  Click on the <strong>"New expense"</strong> button above to
+                  create
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </AuthContainer>
+      {/* Utilisation propre du Modal contrôlé */}
+      <Modal isShown={modalShown} onClose={() => setModalShown(false)}>
+        <div className="p-2">
+          <h2 className="text-xl font-bold text-gray-800 mb-6 dark:text-gray-600">
+            New expense
+          </h2>
+          <form onSubmit={(e) => {e.preventDefault(); console.log(fields)}}>
+            {/* Grille responsive : 1 colonne sur mobile, 2 colonnes sur tablette/desktop */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-h-[60vh] overflow-y-auto px-1 py-2">
+              {fields.map((field, index) => {
+                if(field.group && !field.groupLeader){
+                  const leader=fields.find(f => f.group==field.group && f.groupLeader)
+                  if(!form[leader.name]) return;
+                }
+                return (
+                  <Input2
+                    field={field}
+                    key={index}
+                    required={!field.notRequired}
+                    onChange={(e) => {
+                      const value =
+                        e.target.type === "checkbox"
+                          ? e.target.checked
+                          : e.target.value;
+                      setForm((prev) => ({
+                        ...prev,
+                        [field.name]: value,
+                      }));
+                    }}
+                  />
+                );
+              })}
+            </div>
+            <div className="mt-8 pt-4 border-t border-gray-100 flex justify-end gap-3">
+              <Button1
+                type="button"
+                onClick={() => setModalShown(false)}
+                className="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-sm transition-colors"
+              >
+                Cancel
+              </Button1>
+              <Button1
+                type="submit"
+                className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg text-sm transition-colors"
+              >
+                Save Expense
+              </Button1>
+            </div>
+          </form>
+        </div>
+      </Modal>
+      {/* <p className="wrap-break-word">{JSON.stringify(fields)}</p> */}
+    </div>
+  );
+}
